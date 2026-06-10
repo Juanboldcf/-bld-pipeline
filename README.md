@@ -11,6 +11,7 @@ graph TB
     subgraph STRATEGIC["🧭 Strategic Layer"]
         KRC["bld-kr-compass\nQuarterly KR Guardian"]
         RG["bld-roadmap-guardian\nRoadmap & Backlog Governor"]
+        DR["bld-dependency-radar\nWeekly Dependency Scanner"]
     end
 
     subgraph EXECUTION["⚙️ Execution Pipeline"]
@@ -28,6 +29,7 @@ graph TB
     end
 
     KRC -->|KR status every sprint| RG
+    DR -->|Weekly dependency report| PM
     RG -->|Priority & parallelization signals| PM
     PM -->|Tasks| DEV
     PM -->|Tasks| QA
@@ -36,6 +38,7 @@ graph TB
     RG <-->|Read backlog / Request permission to update| CU
     RG <-->|Request permission to update| ADO
     RG <-->|Request permission to update| SLIDES
+    DR <-->|Read backlog weekly| CU
     KRC <-->|Manual feed / future integration| LOVIFY
 
     style STRATEGIC fill:#1e3a5f,color:#fff,stroke:#4a90d9
@@ -57,6 +60,17 @@ graph TB
 - Monitors backlog health and flags drift
 - **Requires explicit PM permission** before writing to ClickUp, Azure DevOps, or roadmap slides
 - Receives KR status from `bld-kr-compass` every sprint and uses it as a primary prioritization factor
+
+#### `bld-dependency-radar`
+> Weekly watchdog for blocked tasks and cross-team dependencies.
+
+- Scans the full ClickUp sprint backlog every Monday
+- Detects blockers, stalled tasks (>5 days in progress), and unmet DOR
+- Produces a structured Dependency Report for PM review
+- Drafts stakeholder communication messages for PM to send
+- Future: posts directly to a designated Slack channel
+
+---
 
 #### `bld-kr-compass`
 > Quarterly KR north star — keeps the team and C-level aligned.
@@ -125,7 +139,12 @@ graph LR
 ~/.claude/
 ├── agents/              # Agent definition files (.md)
 │   ├── bld-roadmap-guardian.md
-│   └── bld-kr-compass.md
+│   ├── bld-kr-compass.md
+│   ├── bld-dependency-radar.md
+│   ├── bld-pm-orchestrator.md
+│   ├── bld-dev-agent.md
+│   ├── bld-qa-agent.md
+│   └── bld-docs-agent.md
 ├── agent-memory/        # Persistent memory across sessions
 ├── cost-logs/           # Token usage & cost tracking
 ├── scripts/             # Utility scripts
@@ -192,9 +211,13 @@ gh auth login
 ## Roadmap
 
 - [x] Strategic layer: `bld-roadmap-guardian` + `bld-kr-compass`
-- [ ] Execution pipeline agents
+- [x] Dependency radar: `bld-dependency-radar` (weekly ClickUp scan)
+- [x] ClickUp task template (Context / Process / Verification / DOR / DOD / KR Alignment)
+- [x] Update audit trail (date, approver, meeting + Google Drive transcript link)
+- [x] Execution pipeline agents: `bld-pm-orchestrator`, `bld-dev-agent`, `bld-qa-agent`, `bld-docs-agent`
 - [ ] ClickUp MCP integration
 - [ ] Azure DevOps MCP integration
+- [ ] Slack integration for dependency reports
 - [ ] Cost tracking dashboard
 - [ ] Lovify KR feed integration
 

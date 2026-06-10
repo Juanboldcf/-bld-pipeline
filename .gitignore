@@ -1,0 +1,10 @@
+# Secrets - never upload these
+.env
+config.json
+*.env
+
+# OS files
+.DS_Store
+
+# Local memory that shouldn't be shared
+agent-memory-local/

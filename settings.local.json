@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 *)",
+      "Bash(open *)",
+      "mcp__figma-remote-mcp__search_design_system",
+      "mcp__figma-remote-mcp__get_libraries",
+      "mcp__figma-remote-mcp__use_figma"
+    ]
+  }
+}
