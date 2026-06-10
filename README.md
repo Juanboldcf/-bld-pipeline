@@ -8,6 +8,19 @@
 
 ```mermaid
 graph TB
+    subgraph DISCOVERY["🔭 Discovery Layer"]
+        MT["bld-market-trends\nMarket Intelligence"]
+        CX["bld-cx-insights\nCX & Survey Analysis"]
+        IT["bld-idea-tank\nIdeation & Proposals"]
+        DS["bld-discovery-synthesis\nOpportunity Brief → C-level Approval"]
+    end
+
+    subgraph DEFINITION["📋 Product Definition Layer"]
+        PR["bld-pr-agent\nPress Release & FAQ"]
+        PRD["bld-prd-agent\nPRD — Area Reviews & Approval"]
+        HU["bld-hu-agent\nUser Stories → ADO"]
+    end
+
     subgraph STRATEGIC["🧭 Strategic Layer"]
         KRC["bld-kr-compass\nQuarterly KR Guardian"]
         RG["bld-roadmap-guardian\nRoadmap & Backlog Governor"]
@@ -15,10 +28,10 @@ graph TB
     end
 
     subgraph EXECUTION["⚙️ Execution Pipeline"]
-        PM["PM Orchestrator\nSprint planning & delegation"]
-        DEV["Dev Agents\nFeature implementation"]
-        QA["QA Agents\nValidation & testing"]
-        DOC["Docs Agents\nDocumentation & changelogs"]
+        PMO["bld-pm-orchestrator\nSprint planning & delegation"]
+        DEV["bld-dev-agent\nFeature implementation"]
+        QA["bld-qa-agent\nValidation & testing"]
+        DOC["bld-docs-agent\nDocumentation & changelogs"]
     end
 
     subgraph INTEGRATIONS["🔗 Integrations"]
@@ -28,19 +41,30 @@ graph TB
         LOVIFY["Lovify\nKR data feed (future)"]
     end
 
+    MT -->|Market signals| DS
+    CX -->|CX evidence| DS
+    IT -->|Idea catalog| DS
+    DS -->|Approved opportunity| PR
+    PR -->|Approved PR| PRD
+    PRD -->|Fully approved PRD| HU
+    HU -->|HU set| PMO
+
     KRC -->|KR status every sprint| RG
-    DR -->|Weekly dependency report| PM
-    RG -->|Priority & parallelization signals| PM
-    PM -->|Tasks| DEV
-    PM -->|Tasks| QA
-    PM -->|Tasks| DOC
+    DR -->|Weekly dependency report| PMO
+    RG -->|Priority & parallelization signals| PMO
+    PMO -->|Tasks| DEV
+    PMO -->|Tasks| QA
+    PMO -->|Tasks| DOC
 
     RG <-->|Read backlog / Request permission to update| CU
     RG <-->|Request permission to update| ADO
     RG <-->|Request permission to update| SLIDES
     DR <-->|Read backlog weekly| CU
+    HU -->|Create work items| ADO
     KRC <-->|Manual feed / future integration| LOVIFY
 
+    style DISCOVERY fill:#2d1b4e,color:#fff,stroke:#9b59b6
+    style DEFINITION fill:#1a3a4a,color:#fff,stroke:#3498db
     style STRATEGIC fill:#1e3a5f,color:#fff,stroke:#4a90d9
     style EXECUTION fill:#1a4a2e,color:#fff,stroke:#4caf50
     style INTEGRATIONS fill:#3a1e1e,color:#fff,stroke:#e57373
@@ -49,6 +73,35 @@ graph TB
 ---
 
 ## Agent Descriptions
+
+### 🔭 Discovery Layer
+
+#### `bld-market-trends`
+> Scans industry trends, competitor moves, and emerging opportunities.
+
+#### `bld-cx-insights`
+> Analyzes customer surveys, NPS, support tickets, and CX channel feedback.
+
+#### `bld-idea-tank`
+> Collects and evaluates internal proposals and ideation sessions.
+
+#### `bld-discovery-synthesis`
+> Weighs market + CX + ideas into a ranked Opportunity Brief. **C-level approval required** before moving to PR stage.
+
+---
+
+### 📋 Product Definition Layer
+
+#### `bld-pr-agent`
+> Amazon-style Press Release and FAQ. Customer-first narrative before any technical work begins. Requires C-level + PM approval to unlock PRD.
+
+#### `bld-prd-agent`
+> Full PRD with structured review cycles across all BLD areas: UX/UI, Legal, Finance, Core, FinOps, Backend, Mobile, Web, Operations, Platform, Auth/ID, Lifecycle. **All area heads + C-level must approve** before HU generation is unlocked.
+
+#### `bld-hu-agent`
+> Breaks the approved PRD into ADO-format User Stories (Como/Quiero/Para), grouped by epic and area. Hands HU set to bld-pm-orchestrator.
+
+---
 
 ### 🧭 Strategic Layer
 
@@ -138,9 +191,24 @@ graph LR
 ```
 ~/.claude/
 ├── agents/              # Agent definition files (.md)
-│   ├── bld-roadmap-guardian.md
+│   │
+│   ├── # Discovery Layer
+│   ├── bld-market-trends.md
+│   ├── bld-cx-insights.md
+│   ├── bld-idea-tank.md
+│   ├── bld-discovery-synthesis.md
+│   │
+│   ├── # Product Definition Layer
+│   ├── bld-pr-agent.md
+│   ├── bld-prd-agent.md
+│   ├── bld-hu-agent.md
+│   │
+│   ├── # Strategic Layer
 │   ├── bld-kr-compass.md
+│   ├── bld-roadmap-guardian.md
 │   ├── bld-dependency-radar.md
+│   │
+│   ├── # Execution Pipeline
 │   ├── bld-pm-orchestrator.md
 │   ├── bld-dev-agent.md
 │   ├── bld-qa-agent.md
@@ -210,11 +278,13 @@ gh auth login
 
 ## Roadmap
 
-- [x] Strategic layer: `bld-roadmap-guardian` + `bld-kr-compass`
-- [x] Dependency radar: `bld-dependency-radar` (weekly ClickUp scan)
-- [x] ClickUp task template (Context / Process / Verification / DOR / DOD / KR Alignment)
+- [x] Discovery layer: `bld-market-trends`, `bld-cx-insights`, `bld-idea-tank`, `bld-discovery-synthesis`
+- [x] Product definition layer: `bld-pr-agent`, `bld-prd-agent`, `bld-hu-agent`
+- [x] Strategic layer: `bld-roadmap-guardian`, `bld-kr-compass`, `bld-dependency-radar`
+- [x] Execution pipeline: `bld-pm-orchestrator`, `bld-dev-agent`, `bld-qa-agent`, `bld-docs-agent`
+- [x] ClickUp task template (Context / Process / DOR / DOD / KR Alignment)
+- [x] ADO user story template (Como/Quiero/Para + Reglas + DoR + Técnico + DoD)
 - [x] Update audit trail (date, approver, meeting + Google Drive transcript link)
-- [x] Execution pipeline agents: `bld-pm-orchestrator`, `bld-dev-agent`, `bld-qa-agent`, `bld-docs-agent`
 - [ ] ClickUp MCP integration
 - [ ] Azure DevOps MCP integration
 - [ ] Slack integration for dependency reports
