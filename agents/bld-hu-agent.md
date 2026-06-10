@@ -50,6 +50,12 @@ Para: [Beneficio/Valor de negocio]
 
 📈 En Proyecto DBT:
 
+🎨 UX/UI:
+  - Wireframes / prototipos: [Figma link]
+  - Flujos de usuario: [descripción o link]
+  - Componentes afectados: [lista]
+  - Notas de accesibilidad: [observaciones]
+
 ## Definition of Done (DoD)
 - [ ] Todos los criterios de aceptación cumplidos
 - [ ] Especificaciones técnicas implementadas y verificadas
