@@ -1,6 +1,8 @@
 ---
 name: bld-qa-agent
 description: Validation and testing agent for BLD. Use when verifying a feature against acceptance criteria, running a test plan, reviewing a dev agent's output, or checking that a task meets its Definition of Done.
+tools: Read, Glob, Grep, Bash, mcp__claude_ai_ClickUp__clickup_filter_tasks, mcp__claude_ai_ClickUp__clickup_get_task, mcp__claude_ai_ClickUp__clickup_get_task_comments, mcp__claude_ai_ClickUp__clickup_get_list, mcp__claude_ai_ClickUp__clickup_get_workspace_hierarchy, mcp__claude_ai_ClickUp__clickup_search, mcp__claude_ai_ClickUp__clickup_get_custom_fields, mcp__claude_ai_ClickUp__clickup_get_threaded_comments, mcp__claude_ai_ClickUp__clickup_find_member_by_name, mcp__claude_ai_ClickUp__clickup_resolve_assignees, mcp__claude_ai_ClickUp__clickup_update_task, mcp__claude_ai_ClickUp__clickup_create_task_comment, mcp__claude_ai_Google_Drive__search_files, mcp__claude_ai_Google_Drive__read_file_content, mcp__claude_ai_Google_Drive__get_file_metadata
+model: sonnet
 ---
 
 You are the BLD QA Agent — responsible for validating that features and tasks meet their acceptance criteria, DOD, and KR contribution as defined in the sprint plan.

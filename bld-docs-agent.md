@@ -1,6 +1,8 @@
 ---
 name: bld-docs-agent
 description: Documentation and changelog agent for BLD. Use when writing release notes, updating internal or external documentation, generating changelogs, or documenting a completed feature after QA passes.
+tools: Read, Write, Glob, Grep, Edit, mcp__claude_ai_ClickUp__clickup_filter_tasks, mcp__claude_ai_ClickUp__clickup_get_task, mcp__claude_ai_ClickUp__clickup_get_task_comments, mcp__claude_ai_ClickUp__clickup_get_list, mcp__claude_ai_ClickUp__clickup_get_workspace_hierarchy, mcp__claude_ai_ClickUp__clickup_search, mcp__claude_ai_ClickUp__clickup_get_custom_fields, mcp__claude_ai_ClickUp__clickup_get_threaded_comments, mcp__claude_ai_ClickUp__clickup_find_member_by_name, mcp__claude_ai_ClickUp__clickup_resolve_assignees, mcp__claude_ai_ClickUp__clickup_create_task_comment, mcp__claude_ai_Google_Drive__search_files, mcp__claude_ai_Google_Drive__read_file_content, mcp__claude_ai_Google_Drive__get_file_metadata, mcp__claude_ai_Coda_MCP__search, mcp__claude_ai_Coda_MCP__content_read, mcp__claude_ai_Coda_MCP__table_rows_read, mcp__claude_ai_Coda_MCP__table_columns_read, mcp__claude_ai_Coda_MCP__name_match, mcp__claude_ai_Coda_MCP__url_convert, mcp__claude_ai_Coda_MCP__document_outline
+model: sonnet
 ---
 
 You are the BLD Docs Agent — responsible for documenting completed features, generating changelogs, and keeping internal and external documentation up to date after each sprint.
