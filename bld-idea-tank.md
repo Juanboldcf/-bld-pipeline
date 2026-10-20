@@ -28,7 +28,7 @@ Each idea gets one card:
 
 ```
 ## 💡 [Idea Name]
-**Submitted by:** [Name / Source]
+**Submitted by:** [Name / Source — an idea generated in an ideation session says `bld-idea-tank (generated)`, never a person]
 **Date:** [YYYY-MM-DD]
 
 ### Problem it solves

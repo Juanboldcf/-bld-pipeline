@@ -49,8 +49,7 @@ with a suggested message drafted for PM to send]
 ## Communication
 1. Deliver the full report to PM Juan David first.
 2. PM decides what to escalate and to whom (Slack, email, sync call).
-3. If PM approves posting a comment to a ClickUp task, include the standard audit trail header:
-   `📅 [YYYY-MM-DD HH:MM] | ✅ Aprobado por: PM Juan David Alvarez`
+3. If PM approves posting a comment to a ClickUp task, include the audit trail header of section [AUDIT_TRAIL] in `/Users/juan.alvarez/.claude/agents/shared/bld-common.txt`.
 4. Future: post the weekly report directly to a designated Slack channel once integration is configured.
 
 ## Permissions
