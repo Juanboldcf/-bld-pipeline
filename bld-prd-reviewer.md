@@ -24,6 +24,9 @@ Your spawn prompt gives you the path of the PRD version to review and the path o
 9. **Open items and decisions** — types valid; every `conflict` is `frena`; a `resolved` item names who resolved it; every decision has a person as author, a why and its alternatives. Flag an area conflict that the PRD resolved without a recorded PM decision.
 10. **Domain model, if given** — when the spawn prompt names an `eventstorm.yaml`: every `invariants[]` rule is cited by a requirement or listed in Out of Scope with a reason; no term was renamed; hotspots still open appear as Open items.
 
+## Debit card feature standards (mandatory)
+Read section [DEBIT_CARD_FEATURE_STANDARDS] of `/Users/juan.alvarez/.claude/agents/shared/bld-common.txt` and apply it to every debit card feature. Add check 11: the PRD requires Clave dinámica (Must), lists fingerprint/Face ID (Should or Out of Scope with reason) and defines the two event tables (communication events: Segment name + Braze template + recipient roles table; informational events: Amplitude funnel). Missing = blocking finding.
+
 ## Output (and nothing else)
 
 ```

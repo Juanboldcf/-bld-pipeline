@@ -169,3 +169,37 @@ When the PM names an Event Storming model (docs/domain/<slug>/eventstorm.yaml, p
 - domain.scope.excludes and glossary[].exclusions → Out of Scope, with their `why`.
 - decisions[] → already decided: cite their id and authors; do not reopen or re-ask.
 If the model's `session.levels` are not all `cerrado`, say so in your reply: the rules may still move.
+
+=====================================================================
+[DEBIT_CARD_FEATURE_STANDARDS]
+=====================================================================
+Estándares obligatorios para TODO feature de Tarjeta Débito Bold CF. Un feature que no los cumple no pasa PRD review, HU review ni QA.
+
+1. Autenticación / seguridad (features de T. débito)
+   - REQUERIDO (mínimo, MoSCoW Must): Clave dinámica.
+   - Deseable (Should), implementar si es viable: Huella (fingerprint) y Face ID. Lo ideal es que los tres estén implementados.
+   - Si el feature solo implementa Clave dinámica, la ausencia de huella y Face ID se registra como Open item o en Out of Scope con su razón, nunca en silencio.
+   - Un feature sin Clave dinámica es FAIL / bloqueante. No se puede exonerar sin aprobación explícita del PM (es un DOD waiver).
+
+2. Eventos (siempre explícitos y claros). Segment es la fuente única: el mismo evento alimenta Braze y Amplitude. Braze actúa (dispara comunicación); Amplitude observa (mide). No describir uno haciendo el trabajo del otro.
+   Todo feature clasifica cada evento en uno de dos tipos:
+
+   A) Eventos de comunicación (disparan Braze). Por cada uno documentar:
+      - Nombre exacto del evento en Segment, cuándo se emite (acción del usuario o regla) y sus propiedades.
+      - Template de comunicación: canal (los disponibles hoy son solo in-app y push; no proponer email, SMS ni WhatsApp salvo que el PM confirme que ya existen), asunto/título, cuerpo, CTA y variables. El template debe existir (o estar entregado por Marketing/Lifecycle) antes de pasar a QA; un evento sin template es incompleto.
+      - Tabla de roles/audiencias destinatarias: a qué roles debe llegar la comunicación (ej. dueño del negocio, administrador, usuario Pro/equipo, titular de la tarjeta, soporte/operaciones), por qué canal y con qué condición. Si un rol NO debe recibirla, indicarlo.
+
+      | Evento (Segment) | Cuándo se emite | Propiedades | Template (canal + contenido) | Roles destinatarios | Condiciones |
+
+   B) Eventos informativos (miden en Amplitude). Sirven para entender los funnels de uso de los productos y features internos (ej. inicio → paso intermedio → éxito / abandono / error). Por cada uno documentar: nombre exacto, cuándo se emite, propiedades, paso del funnel que representa y KR o métrica a la que aporta. Cada feature debe definir su funnel completo (todos los pasos y la salida de error), no eventos sueltos.
+
+      | Evento (Segment) | Paso del funnel | Propiedades | Métrica / KR en Amplitude |
+
+   Un evento puede ser de ambos tipos; en ese caso aparece en las dos tablas. Un feature sin ambas tablas (o sin "N/A — razón" explícito en una) es incompleto: bloqueante en PRD y HU, y QA no lo aprueba.
+
+Dónde se aplica cada agente:
+- bld-prd-agent: incluir ambos puntos como requisitos (F y NF) con owner (Auth/ID para 1; Lifecycle/Platform para 2) y las dos tablas de eventos (comunicación con template y roles; informativos con funnel).
+- bld-hu-agent: cada HU de feature de T. débito lleva criterios de aceptación para 1 y una sección de eventos Segment → Braze/Amplitude.
+- bld-prd-reviewer / bld-hu-reviewer: verificar su presencia y claridad; ausencia = hallazgo bloqueante.
+- bld-dev-agent: implementar la autenticación y emitir los eventos Segment con el nombre y propiedades de las tablas, y entregar/configurar con Lifecycle los templates de comunicación.
+- bld-qa-agent: validador final; prueba cada método de autenticación implementado y verifica que cada evento se emite (Segment), que los de comunicación disparan Braze con el template correcto y llegan solo a los roles de la tabla, y que los informativos quedan en Amplitude con el funnel completo.

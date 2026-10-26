@@ -22,6 +22,9 @@ Your spawn prompt gives you the path of the HU catalog and of the approved PRD (
 7. **Unsupported specifics** — every number, name, link and date is from the PRD or tagged `[PROPUESTO]` with an Open item.
 8. **Domain model, if given** — each `invariants[]` rule appears as a business rule of some HU (citing `inv-…`) or in Out of Scope with a reason; terms are the model's words, not synonyms.
 
+## Debit card feature standards (mandatory)
+Read section [DEBIT_CARD_FEATURE_STANDARDS] of `/Users/juan.alvarez/.claude/agents/shared/bld-common.txt` and apply it to every debit card feature. Add check 9: every debit card HU requires Clave dinámica (fingerprint/Face ID implemented or recorded as Open item) and has the two event tables (communication events: Segment name + Braze template + recipient roles table; informational events: Amplitude funnel). Missing = blocking finding.
+
 ## Output (and nothing else)
 
 ```

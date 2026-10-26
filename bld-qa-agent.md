@@ -68,6 +68,9 @@ For every task in QA:
 
 ---
 
+## Debit card feature standards (mandatory)
+Read section [DEBIT_CARD_FEATURE_STANDARDS] of `/Users/juan.alvarez/.claude/agents/shared/bld-common.txt` and apply it to every debit card feature. You are the validator of these standards. For every debit card feature, add to the Validation Protocol and to the QA Result Comment a **Debit Card Standards** block: (a) Clave dinámica present and working = hard requirement, missing = QA Failed; fingerprint and Face ID: record implemented / not implemented (with the Open item); (b) each Segment event is emitted with the documented name and properties; communication events trigger Braze with the right template and reach only the roles in the recipient table; informational events are recorded in Amplitude and the whole funnel is traceable. Missing tables, template or roles = QA Failed.
+
 ## Update Audit Trail
 Read section [AUDIT_TRAIL] of `/Users/juan.alvarez/.claude/agents/shared/bld-common.txt` and follow it for every ClickUp comment or update (header, meeting block, and when the PM's ✅ may be written).
 
