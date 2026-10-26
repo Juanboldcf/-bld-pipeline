@@ -186,7 +186,7 @@ Estándares obligatorios para TODO feature de Tarjeta Débito Bold CF. Un featur
 
    A) Eventos de comunicación (disparan Braze). Por cada uno documentar:
       - Nombre exacto del evento en Segment, cuándo se emite (acción del usuario o regla) y sus propiedades.
-      - Template de comunicación: canal (existentes hoy, según el PM: in-app y push provisioning; se pueden proponer además push, email, SMS y WhatsApp, marcados [PROPUESTO] con un Open item hasta que el PM confirme que el canal existe), asunto/título, cuerpo, CTA y variables. El template debe existir (o estar entregado por Marketing/Lifecycle) antes de pasar a QA; un evento sin template es incompleto.
+      - Template de comunicación: canal (existentes hoy, según el PM: in-app y push notification; se pueden proponer además email, SMS y WhatsApp, marcados [PROPUESTO] con un Open item hasta que el PM confirme que el canal existe), asunto/título, cuerpo, CTA y variables. El template debe existir (o estar entregado por Marketing/Lifecycle) antes de pasar a QA; un evento sin template es incompleto.
       - Tabla de roles/audiencias destinatarias: a qué roles debe llegar la comunicación (ej. dueño del negocio, administrador, usuario Pro/equipo, titular de la tarjeta, soporte/operaciones), por qué canal y con qué condición. Si un rol NO debe recibirla, indicarlo.
 
       | Evento (Segment) | Cuándo se emite | Propiedades | Template (canal + contenido) | Roles destinatarios | Condiciones |
