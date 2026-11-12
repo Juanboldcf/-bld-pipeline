@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="es" data-theme="pastel">
+<head>
+<meta charset="utf-8">
+<title>Oficina BLD · Pixel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- SOLO LOCAL. Esta vista no escribe en Bold Brain ni en ningún servicio externo. Assets: /assets (generados con make_assets.py). -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/core.css">
+<script>document.documentElement.dataset.theme=new URLSearchParams(location.search).get("theme")||localStorage.getItem("office.theme")||"pastel"</script>
+<style>
+  /* Tema pastel (por defecto, claro) y atardecer (suave, no oscuro). Mismo tipo de letra que la vista profesional. */
+  :root{
+    --bg:#f4efff; --panel:#ffffff; --panel2:#f8f5ff; --ink:#3d3560; --muted:#5f5888; --line:#cdbff2; --accent:#5b3fd0;
+    --mint:#c9f2de; --mint-ink:#16704a; --butter:#fff1b8; --butter-ink:#7a4f00; --rose:#ffd9e2; --rose-ink:#a61f45; --sky:#d6e9ff; --sky-ink:#1f5aa6; --lilac:#e6dcff;
+    --track:#e9e2fb; --wallfx:transparent; --floorfx:transparent; --frame:url(/assets/frame_light.png); --shadow:0 3px 0 rgba(74,66,112,.18);
+    --o-bg:#ffffff; --o-panel:#f4efff; --o-panel2:#ffffff; --o-fg:#3d3560; --o-muted:#5f5888; --o-line:#cdbff2;
+    --o-accent:#5b3fd0; --o-hot:#d63a63; --o-hot-fg:#ffffff; --o-ok:#16704a; --o-warn:#7a4f00; --o-err:#a61f45;
+    --o-user:#5b3fd0; --o-user-fg:#ffffff; --o-agent:#efe9ff; --o-agent-fg:#3d3560;
+    --o-dock-bg:#4a4270; --o-dock-panel:#5a5188; --o-dock-fg:#ffffff; --o-dock-muted:#ddd6ff; --o-dock-line:#7d72b8;
+    --o-r:14px; --o-r-btn:12px; --o-bw:2px; --o-chat-w:470px; --o-scene-bg:#f6e2c8;
+    --o-font:'Montserrat',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  [data-theme=dusk]{
+    --bg:#3c4378; --panel:#4b5494; --panel2:#434c8a; --ink:#ffffff; --muted:#dbe0ff; --line:#8791d6; --accent:#ffe08a;
+    --mint:#2f7d68; --mint-ink:#d4ffe9; --butter:#7d6a2a; --butter-ink:#fff0b0; --rose:#8a3d5b; --rose-ink:#ffdbe6; --sky:#3d6aa8; --sky-ink:#dcecff; --lilac:#5d5aa3;
+    --track:#363d73; --wallfx:rgba(60,67,120,.52); --floorfx:rgba(60,67,120,.42); --frame:url(/assets/frame_night.png); --shadow:0 3px 0 rgba(20,24,60,.35);
+    --o-bg:#434c8a; --o-panel:#4b5494; --o-panel2:#4b5494; --o-fg:#ffffff; --o-muted:#dbe0ff; --o-line:#8791d6;
+    --o-accent:#ffe08a; --o-hot:#ff9db4; --o-hot-fg:#3a1020; --o-ok:#9af0c8; --o-warn:#ffe08a; --o-err:#ffb3c4;
+    --o-user:#6d63d6; --o-user-fg:#ffffff; --o-agent:#5a63a8; --o-agent-fg:#ffffff;
+    --o-on-accent:#3a2a00; --o-badge-bg:#3a4180; --o-dock-bg:#2f356a; --o-dock-panel:#3a4180; --o-dock-fg:#ffffff; --o-dock-muted:#d0d6ff; --o-dock-line:#6a74c0; --o-scene-bg:#6b6fae;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink)}
+  body{font-family:var(--o-font);font-size:14px;line-height:1.5;transition:background .25s}
+  canvas,img{image-rendering:pixelated} canvas{display:block}
+  button{font-family:inherit}
+  /* tarjetas con marco de cuadro de diálogo (9-slice) */
+  .card{background:var(--panel);border:16px solid transparent;border-image:var(--frame) 8 / 16px stretch;background-clip:padding-box;padding:0 2px 2px;margin-bottom:12px;filter:drop-shadow(var(--shadow))}
+  .card h2{margin:-6px 0 8px;font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--accent)}
+  .none{color:var(--muted);font-size:13px}
+  /* HUD */
+  .hud{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 20px;background:var(--panel);border-bottom:4px solid var(--line)}
+  .hud h1{margin:0;font-size:17px;font-weight:800;color:var(--accent);display:flex;align-items:center;gap:10px}
+  .hud select,.hud a,.hud button{font:inherit;font-size:13px;font-weight:700;background:var(--panel2);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:7px 13px;cursor:pointer;text-decoration:none}
+  .hud select{max-width:300px} .hud a:hover,.hud button:hover,.hud select:hover{border-color:var(--accent);color:var(--accent)}
+  .hud .newp{background:var(--o-hot);border-color:var(--o-hot);color:var(--o-hot-fg)} .hud .newp:hover{filter:brightness(1.08);color:var(--o-hot-fg)}
+  .hud .sp{flex:1}
+  .stat{background:var(--panel2);border:2px solid var(--line);border-radius:99px;padding:5px 13px;font-size:12.5px;font-weight:700}
+  .stat.red{background:var(--rose);border-color:var(--rose-ink);color:var(--rose-ink)} .stat.amb{background:var(--butter);border-color:var(--butter-ink);color:var(--butter-ink)} .stat.hand{background:var(--mint);border-color:var(--mint-ink);color:var(--mint-ink)}
+  /* proyecto activo + hitos */
+  .pcard{margin:14px 20px 0}
+  .ptop{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+  .ticon{width:54px;height:54px;border-radius:14px;background:var(--tc,var(--lilac));display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);flex:none}
+  .ptitle{min-width:0} .ptitle b{display:block;font-size:20px;font-weight:800;line-height:1.2;text-transform:capitalize}
+  .ptitle small{color:var(--muted);font-size:13px;font-weight:600}
+  .idc{display:inline-block;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-weight:800;font-size:13px;background:var(--tc,var(--accent));color:#fff;border-radius:8px;padding:1px 9px;margin-right:6px}
+  .psum{margin-left:auto;text-align:right;min-width:210px} .psum b{font-size:22px;font-weight:800;color:var(--accent)} .psum small{display:block;color:var(--muted);font-size:12.5px;font-weight:600}
+  .pbar{height:14px;background:var(--track);border:2px solid var(--ink);border-radius:99px;overflow:hidden;margin-top:6px}
+  .pbar i{display:block;height:100%;background:var(--mint-ink);transition:width .5s} .pbar.warn i{background:#d99a1e} .pbar.crit i{background:var(--rose-ink)}
+  .route{display:flex;gap:0;overflow-x:auto;padding:6px 2px 4px}
+  .node{flex:1 0 98px;min-width:98px;text-align:center;position:relative;padding:0 4px}
+  .node::before{content:"";position:absolute;top:27px;left:-50%;right:50%;height:5px;background:var(--track);border-radius:3px;z-index:0}
+  .node:first-child::before{display:none} .node.done::before{background:var(--mint-ink)}
+  .nic{position:relative;z-index:1;width:56px;height:56px;margin:0 auto 6px;border-radius:50%;background:var(--track);border:3px dashed var(--line);display:flex;align-items:center;justify-content:center}
+  .nic canvas{opacity:.45;filter:grayscale(1)}
+  .node.done .nic{background:var(--mint);border:3px solid var(--mint-ink)} .node.done .nic canvas{opacity:1;filter:none}
+  .node.done .nic::after{content:"✓";position:absolute;right:-4px;bottom:-3px;width:20px;height:20px;border-radius:50%;background:var(--mint-ink);color:#fff;font-size:12px;font-weight:800;line-height:20px;border:2px solid var(--panel)}
+  .node.next .nic{background:var(--butter);border:3px solid var(--butter-ink);animation:glow 1.8s ease-in-out infinite} .node.next .nic canvas{opacity:1;filter:none}
+  @keyframes glow{50%{box-shadow:0 0 0 6px rgba(217,154,30,.25)}}
+  .node b{display:block;font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.25} .node small{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
+  .node.next small{color:var(--butter-ink);font-weight:800}
+  /* oficina */
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;padding:14px 20px}
+  @media(max-width:1100px){.layout{grid-template-columns:1fr}}
+  .office{border:4px solid var(--ink);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+  .wall{position:relative;background:url(/assets/tile_wall.png);background-size:64px 64px;padding:14px 12px 0;border-bottom:0}
+  .wall::before,.floor::before{content:"";position:absolute;inset:0;pointer-events:none;background:var(--wallfx)}
+  .deco{overflow:hidden;display:flex;justify-content:space-around;align-items:flex-end;gap:8px;position:relative;margin-bottom:8px}
+  .deco img{height:auto} .deco .win{width:192px} .deco .clock{width:60px;align-self:center} .deco .poster{width:60px;align-self:center} .deco .wb{width:168px;align-self:center}
+  .doors{display:flex;flex-wrap:wrap;justify-content:space-around;gap:6px 6px;position:relative;padding-bottom:6px}
+  .pdoor{position:relative;cursor:pointer;text-align:center;width:112px;padding:6px 0 2px;border-radius:10px;transition:transform .12s}
+  .pdoor:hover{transform:translateY(-3px)} .pdoor:focus-visible{outline:3px solid var(--accent)}
+  .pdoor img.dimg{width:96px;display:block;margin:0 auto}
+  .plamp{position:absolute;left:50%;top:-6px;transform:translateX(-50%);min-width:46px;height:16px;padding:0 6px;border-radius:8px;background:var(--track);color:var(--ink);border:2px solid var(--ink);z-index:2;font-size:10px;font-weight:800;line-height:12px;text-align:center;white-space:nowrap}
+  .pdoor.working .plamp{background:#4cd08e;animation:pulse 1.8s ease-in-out infinite} .pdoor.question .plamp{background:#ffc83d;animation:pulse .9s ease-in-out infinite} .pdoor.hand .plamp{background:#6cb4ff;border-radius:3px}
+  .pdoor.working .plamp,.pdoor.question .plamp,.pdoor.hand .plamp{color:#1d1840}
+  .pdoor.question .psign{border-color:#c98a00;box-shadow:0 0 0 2px #ffc83d} .pdoor.hand .psign{border-color:#2f6fed}
+  @keyframes pulse{50%{opacity:.55}}
+  .lampplan{position:relative;display:flex;gap:4px 14px;flex-wrap:wrap;justify-content:center;font-size:12px;font-weight:700;color:var(--ink);background:var(--panel);border:2px solid var(--ink);border-radius:10px;padding:4px 10px;margin:6px auto 10px;width:max-content;max-width:100%}
+  .lampplan i{display:inline-block;min-width:18px;height:14px;border:2px solid var(--ink);border-radius:7px;text-align:center;font-style:normal;font-size:9px;line-height:10px;margin-right:5px;vertical-align:-2px}
+  .lampplan .q i{background:#ffc83d} .lampplan .h i{background:#6cb4ff;border-radius:3px} .lampplan .w i{background:#4cd08e}
+  .newdoor{position:relative;text-align:center;margin:0 0 10px}
+  .psign{background:var(--panel);border:2px solid var(--ink);border-radius:8px;padding:2px 3px;margin:3px 2px 0}
+  .psign b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:12px;font-weight:800;overflow:hidden;color:var(--ink);line-height:1.15;min-height:28px}
+  .psign small{display:block;font-size:11.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+  .pdoor.working .psign small{color:var(--mint-ink);font-weight:800} .pdoor.question .psign small{color:var(--butter-ink);font-weight:800} .pdoor.hand .psign small{color:var(--sky-ink);font-weight:800}
+  .pdoor.sel .psign{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+  .pcnt{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:2px;z-index:3}
+  .pcnt span{background:var(--butter);color:var(--butter-ink);border:2px solid var(--ink);border-radius:99px;font-size:11px;font-weight:800;padding:0 6px;text-align:center} .pcnt span.h{background:var(--mint);color:var(--mint-ink)}
+  .pdoor.newp .psign{background:var(--o-hot);border-color:var(--o-hot)} .pdoor.newp .psign b,.pdoor.newp .psign small{color:var(--o-hot-fg)}
+  .base{height:32px;background:url(/assets/tile_base.png);background-size:64px 32px}
+  .floor{position:relative;padding:16px 16px 18px;background:url(/assets/tile_wood.png);background-size:64px 64px}
+  .sign{display:inline-block;background:var(--panel);border:2px solid var(--ink);border-radius:99px;color:var(--ink);padding:3px 14px;font-size:12px;font-weight:700;margin:0 0 12px;position:relative}
+  .desks{position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(214px,1fr));gap:6px 10px;margin-bottom:10px}
+  .seat{position:relative;height:252px;cursor:pointer;border-radius:12px}
+  .seat:focus-visible{outline:3px solid var(--accent)}
+  .seat .spr{position:absolute;left:50%;top:0;transform:translateX(-50%);z-index:2;transition:filter .12s}
+  .seat .desk{position:absolute;left:50%;top:104px;width:168px;transform:translateX(-50%);z-index:3}
+  .seat .mon{position:absolute;left:calc(50% - 82px);top:62px;width:60px;z-index:4}
+  .seat .prop{position:absolute;left:calc(50% + 36px);top:82px;z-index:4}
+  .seat .plate{position:absolute;left:4px;right:4px;bottom:0;background:var(--panel);border:2px solid var(--ink);border-radius:10px;padding:4px 8px 6px;text-align:left;z-index:5;box-shadow:var(--shadow)}
+  .plate b{display:block;font-size:12.5px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .plate small{display:block;font-size:11.5px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .abar{height:9px;background:var(--track);border:2px solid var(--ink);border-radius:99px;margin-top:5px;overflow:hidden} .abar i{display:block;height:100%;width:0}
+  .alab{display:block;font-size:11px;font-weight:800;margin-top:3px;color:var(--muted)}
+  .abar.working i{width:100%;background:repeating-linear-gradient(45deg,var(--mint-ink) 0 8px,#5fcf9d 8px 16px);background-size:22px 22px;animation:slide 1s linear infinite} .alab.working{color:var(--mint-ink)}
+  .abar.question i{width:60%;background:#d99a1e} .alab.question{color:var(--butter-ink)}
+  .abar.done i,.abar.delivered i{width:100%;background:var(--sky-ink)} .alab.done,.alab.delivered{color:var(--sky-ink)}
+  .abar.idle i{width:0} @keyframes slide{to{background-position:22px 0}}
+  .seat:hover .plate,.seat.sel .plate{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)} .seat.hand .plate{border-color:var(--mint-ink)}
+  .seat:hover .spr{filter:brightness(1.06)}
+  .tip{position:absolute;left:50%;bottom:calc(100% - 28px);transform:translateX(-50%);width:200px;background:var(--panel);border:2px solid var(--ink);border-radius:10px;padding:6px 9px;font-size:12px;z-index:9;display:none;box-shadow:var(--shadow);pointer-events:none}
+  .tip b{display:block;color:var(--accent);font-size:12px} .tip i{font-style:normal;color:var(--ink);font-weight:600}
+  .seat:hover .tip{display:block}
+  .bubble{position:absolute;top:2px;right:22px;z-index:6;min-width:30px;text-align:center;background:#fff;color:#3d3560;border:2px solid #4a4270;border-radius:12px;padding:0 8px;font-size:14px;font-weight:800;line-height:22px}
+  .bubble::after{content:"";position:absolute;left:10px;bottom:-7px;border:5px solid transparent;border-top-color:#4a4270;border-bottom:0}
+  .bubble.q{background:#ffe08a;animation:hop .5s ease-in-out infinite alternate} .bubble.z{background:#e6e9f8;animation:float 2.4s ease-in-out infinite}
+  .bubble.d{background:#cfe6ff} .bubble.w{background:#c9f2de} .bubble.h{background:#c9f2de;animation:hop .6s ease-in-out infinite alternate}
+  @keyframes hop{to{transform:translateY(-5px)}} @keyframes float{50%{transform:translateY(-4px)}}
+  .flags{position:absolute;left:4px;top:4px;z-index:6;display:flex;flex-direction:column;gap:3px}
+  .flag{display:inline-block;background:var(--pc);color:#fff;border-radius:7px;padding:0 7px;font-size:11px;font-weight:800;text-shadow:0 1px 0 rgba(0,0,0,.35);border:2px solid var(--ink)}
+  .qn{position:absolute;left:4px;top:62px;z-index:6;background:var(--rose);color:var(--rose-ink);border:2px solid var(--rose-ink);border-radius:99px;font-size:11px;font-weight:800;padding:0 7px}
+  .deco-floor{display:flex;justify-content:space-between;align-items:flex-end;position:relative;pointer-events:none;padding:0 6px}
+  .deco-floor img{height:auto} .deco-floor .plant{width:48px} .deco-floor .shelf{width:96px} .deco-floor .cool{width:40px}
+  .legend{position:relative;display:flex;gap:6px 12px;flex-wrap:wrap;font-size:12px;font-weight:600;color:var(--ink);background:var(--panel);border:2px solid var(--ink);border-radius:10px;padding:5px 10px;margin-top:6px}
+  .legend b{font-weight:800}
+  /* panel lateral */
+  .pj{display:block;width:100%;text-align:left;font:inherit;border:2px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:12px;padding:8px 10px;margin-bottom:8px;cursor:pointer}
+  .pj:hover{border-color:var(--accent)} .pj.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+  .pj .t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;text-transform:capitalize} .pj .t span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pj small{display:flex;justify-content:space-between;gap:6px;color:var(--muted);font-size:12px;font-weight:600;margin-top:2px} .pj small b{color:var(--ink)}
+  .quest{border-left:6px solid #d99a1e;background:var(--butter);color:var(--butter-ink);border-radius:10px;padding:6px 10px;margin-bottom:8px;cursor:pointer;font-size:12.5px;font-weight:800}
+  .quest.frena{border-color:var(--rose-ink);background:var(--rose);color:var(--rose-ink)} .quest small{display:block;color:var(--ink);margin-top:2px;font-size:12px;font-weight:500}
+  pre.term{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:8px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;line-height:1.5;max-height:220px;overflow:auto}
+  .btn{font:inherit;font-size:12px;font-weight:700;background:var(--panel2);color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:4px 10px;cursor:pointer;margin:0 4px 4px 0}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .o-scene{background:var(--o-scene-bg) url(/assets/tile_wood.png);background-size:64px 64px}
+  .load{padding:60px;text-align:center;color:var(--muted)}
+
+  /* ===== oficina amplia con pasillo de scroll lateral ===== */
+  .strip[hidden],.hallbar[hidden],.roomview[hidden]{display:none!important}
+  .wide{padding:0 20px;margin-top:14px}
+  .cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;padding:0 20px 20px;margin-top:14px}
+  .office{border:4px solid var(--ink);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+  .hallbar{display:flex;gap:8px;align-items:center;padding:6px 10px;background:var(--panel);border-bottom:3px solid var(--ink)}
+  .hnav{flex:1;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding:2px}
+  .hnav button{flex:none;font:inherit;font-size:12px;font-weight:700;border:2px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:99px;padding:3px 11px;cursor:pointer;white-space:nowrap}
+  .hnav button:hover,.hnav button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+  .hnav button.question{background:var(--butter);border-color:var(--butter-ink);color:var(--butter-ink)} .hnav button.hand{background:var(--sky);border-color:var(--sky-ink);color:var(--sky-ink)} .hnav button.working{background:var(--mint);border-color:var(--mint-ink);color:var(--mint-ink)}
+  .scene{position:relative;overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;scroll-snap-type:x proximity;cursor:grab;scrollbar-width:auto;scrollbar-color:var(--accent) var(--track)}
+  .scene.drag{cursor:grabbing;scroll-behavior:auto;scroll-snap-type:none}
+  .scene::-webkit-scrollbar{height:14px} .scene::-webkit-scrollbar-track{background:var(--track)} .scene::-webkit-scrollbar-thumb{background:var(--accent);border-radius:8px;border:3px solid var(--track)}
+  .strip{display:flex;width:max-content;min-width:100%}
+  .lobby{border-left:6px solid var(--ink)}
+  .zone{scroll-snap-align:start;display:flex;flex-direction:column;position:relative}
+  .zwall{position:relative;height:262px;background:url(/assets/tile_wall.png);background-size:64px 64px;border-bottom:0;padding:16px 18px 0;display:flex;align-items:flex-end}
+  .zwall::before,.zfloor::before{content:"";position:absolute;inset:0;pointer-events:none;background:var(--wallfx);z-index:1}
+  .zwall::after{content:"";position:absolute;left:0;right:0;bottom:0;height:22px;background:url(/assets/tile_base.png);background-size:64px 22px;z-index:0}
+  .zfloor{position:relative;min-height:300px;padding:14px 16px 18px;background:url(/assets/tile_wood.png);background-size:64px 64px;flex:1}
+  .lobby .deco{display:flex;gap:46px;align-items:flex-end;padding-right:30px;margin:0;position:relative;z-index:2}
+  .lobby .deco img{height:auto;flex:none}
+  .lobby .desks{display:flex;gap:10px;margin:0 0 8px;position:relative;z-index:2}
+  .lobby .desks .seat{flex:none;width:214px}
+  .lobby .deco-floor{display:flex;gap:28px;align-items:flex-end;padding:0 10px;position:relative;z-index:2}
+  .doors{display:flex;flex-wrap:nowrap;gap:46px;align-items:flex-end;padding:0 34px 0 14px;position:relative;z-index:2;margin:0}
+  .corridor .pdoor{flex:none;width:132px}
+  .corridor .pdoor img.dimg{width:112px}
+  .corridor .zfloor .sign,.lobby .zfloor .sign{position:sticky;left:18px;z-index:3}
+  .corridor .lampplan{margin:0 0 10px;position:sticky;left:18px;width:max-content;z-index:3}
+  .corrdeco{position:absolute;left:0;right:0;bottom:90px;display:flex;justify-content:space-around;align-items:flex-end;padding:0 40px;pointer-events:none;z-index:2}
+  .corrdeco img{height:auto} .corrdeco .plant{width:52px} .corrdeco .shelf{width:100px} .corrdeco .cool{width:42px}
+  .runner{position:absolute;left:0;right:0;bottom:34px;height:46px;background:repeating-linear-gradient(90deg,var(--rose) 0 56px,transparent 56px 72px);border-top:3px solid var(--rose-ink);border-bottom:3px solid var(--rose-ink);opacity:.75;z-index:1}
+  /* asiento: el agente está sentado detrás del escritorio, con silla */
+  .seat .chair{position:absolute;left:50%;top:38px;width:86px;height:92px;transform:translateX(-50%);background:var(--chair,#8b6cd9);border:3px solid var(--ink);border-radius:20px 20px 6px 6px;z-index:1;box-shadow:inset 0 -10px 0 rgba(0,0,0,.14)}
+  .seat .chair::after{content:"";position:absolute;left:50%;bottom:-16px;width:8px;height:16px;background:var(--ink);transform:translateX(-50%)}
+  .seat.seated .spr{top:16px}
+  .seat.sel .plate{border-color:var(--o-hot);box-shadow:0 0 0 3px var(--o-hot)}
+  /* sala por dentro */
+  .roomview{background:var(--panel)}
+  .rhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 14px;background:var(--panel);border-bottom:3px solid var(--ink)}
+  .rhead b{font-size:16px;font-weight:800;color:var(--accent)}
+  .rlamp{border:2px solid var(--ink);border-radius:99px;padding:2px 12px;font-size:12px;font-weight:800;background:var(--track)}
+  .rlamp.working{background:var(--mint);color:var(--mint-ink)} .rlamp.question{background:var(--butter);color:var(--butter-ink)} .rlamp.hand{background:var(--sky);color:var(--sky-ink)}
+  .rwall{position:relative;height:210px;background:url(/assets/tile_wall.png);background-size:64px 64px;padding:14px 26px 0;display:flex;gap:36px;align-items:flex-end;justify-content:space-around;overflow:hidden}
+  .rwall::before,.rfloor::before{content:"";position:absolute;inset:0;pointer-events:none;background:var(--wallfx)}
+  .rwall img{height:auto;position:relative;z-index:2} .rwall .win{width:200px} .rwall .wb{width:180px} .rwall .clock,.rwall .poster{width:62px;align-self:center} .rwall .dimg{width:120px}
+  .rfloor{position:relative;min-height:340px;padding:22px 20px 24px;background:url(/assets/tile_wood.png);background-size:64px 64px;overflow:hidden}
+  .rrug{position:absolute;inset:14px 12px;border:4px dashed var(--rose-ink);border-radius:22px;background:var(--rose);opacity:.28}
+  .rdesks{position:relative;display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;z-index:2}
+  .rdesks .seat{width:222px;flex:none}
+  .rdeco{position:relative;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:2}
+  .rdeco img{height:auto} .rdeco .plant{width:50px} .rdeco .shelf{width:96px} .rdeco .cool{width:40px}
+  @media(max-width:700px){.zwall{height:262px}.seat .tip{display:none}}
+  .corridor .zfloor .sign,.lobby .zfloor .sign{white-space:normal;max-width:calc(100vw - 90px);border-radius:14px}
+  .corridor .lampplan{max-width:calc(100vw - 90px);width:auto}
+  @media (prefers-reduced-motion:reduce){.scene{scroll-behavior:auto}}
+
+  /* ===== menú de pisos (ascensor): del inicio al final del trabajo, colores Bold + pastel ===== */
+  :root{--bold-navy:#121E6C;--bold-coral:#EE424E;--f0:#fff1b8;--f1:#c9f2de;--f2:#d6e9ff;--f3:#e6dcff;--f4:#ffd9e2;--f5:#ffe3cc;--f6:#d9f3f7}
+  [data-theme=pastel]{--accent:#121E6C;--o-accent:#121E6C;--o-hot:#EE424E;--o-user:#121E6C;--ink:#2b2a55}
+  #office{--ft:rgba(255,255,255,.55);--fw:rgba(255,255,255,.12)}
+  #office[data-floor="1"]{--ft:rgba(201,242,222,.78)} #office[data-floor="2"]{--ft:rgba(214,233,255,.8)} #office[data-floor="3"]{--ft:rgba(230,220,255,.8)}
+  #office[data-floor="4"]{--ft:rgba(255,217,226,.8)} #office[data-floor="5"]{--ft:rgba(255,227,204,.8)} #office[data-floor="6"]{--ft:rgba(217,243,247,.8)} #office[data-floor="0"]{--ft:rgba(255,241,184,.8)}
+  [data-theme=pastel] .zfloor::before,[data-theme=pastel] .rfloor::before{background:var(--ft)}
+  [data-theme=pastel] .zwall::before,[data-theme=pastel] .rwall::before{background:var(--fw)}
+  .floors{flex:1;display:flex;align-items:stretch;gap:0;overflow-x:auto;scrollbar-width:thin;padding:4px 2px}
+  .fl{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:132px;font:inherit;text-align:left;background:var(--fc);color:var(--bold-navy);border:3px solid var(--bold-navy);border-radius:12px;padding:4px 12px 5px;margin-right:22px;cursor:pointer;position:relative}
+  .fl:not(:last-child)::after{content:"▶";position:absolute;right:-19px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--bold-coral)}
+  .fl b{font-size:13px;font-weight:800;display:flex;align-items:center;gap:7px}
+  .fl b i{font-style:normal;background:var(--bold-navy);color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+  .fl small{font-size:11px;font-weight:600;color:#434343} .fl em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--bold-coral);min-height:15px}
+  .fl:hover{transform:translateY(-2px)} .fl.on{box-shadow:0 0 0 3px var(--bold-coral)} .fl:focus-visible{outline:3px solid var(--bold-coral);outline-offset:2px}
+  .fl.question{animation:pulse 1.1s ease-in-out infinite}
+  #wall[data-fl] .pdoor{display:none} #wall[data-fl="0"] .pdoor[data-floor="0"],#wall[data-fl="1"] .pdoor[data-floor="1"],#wall[data-fl="2"] .pdoor[data-floor="2"],#wall[data-fl="3"] .pdoor[data-floor="3"],#wall[data-fl="4"] .pdoor[data-floor="4"],#wall[data-fl="5"] .pdoor[data-floor="5"],#wall[data-fl="6"] .pdoor[data-floor="6"]{display:block}
+  #wall[data-fl="all"] .pdoor{display:block} #wall[data-fl="0"] .pdoor{display:none}
+  .gwins{position:absolute;left:0;right:0;bottom:22px;height:220px;background:url(/assets/window.png) repeat-x left bottom;background-size:320px 220px;image-rendering:pixelated;z-index:0;opacity:.95}
+  .zwall .doors,.zwall .deco{position:relative;z-index:2}
+  .rwall{height:250px} .rwall .win{width:300px}
+  .lobby .deco .win{width:300px}
+  .fbanner{font-weight:800;color:var(--bold-navy)}
+  /* ===== pisos con ascensor, ventanas al valle, jerarquía y legibilidad (colores explícitos: nunca blanco sobre blanco) ===== */
+  :root{--valley:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 150' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%238fd3ff'/%3E%3Cstop offset='1' stop-color='%23fff0cc'/%3E%3C/linearGradient%3E%3CclipPath id='g'%3E%3Crect x='12' y='12' width='316' height='118' rx='3'/%3E%3C/clipPath%3E%3C/defs%3E%3Crect width='340' height='150' rx='6' fill='%23fffaf0' stroke='%23121E6C' stroke-width='4'/%3E%3Cg clip-path='url(%23g)'%3E%3Crect x='12' y='12' width='316' height='118' fill='url(%23s)'/%3E%3Ccircle cx='262' cy='44' r='26' fill='%23ffe27a' opacity='.35'/%3E%3Ccircle cx='262' cy='44' r='15' fill='%23ffe27a'/%3E%3Cellipse cx='70' cy='40' rx='26' ry='7' fill='%23fff' opacity='.9'/%3E%3Cellipse cx='88' cy='35' rx='16' ry='6' fill='%23fff' opacity='.9'/%3E%3Cellipse cx='190' cy='30' rx='22' ry='6' fill='%23fff' opacity='.85'/%3E%3Cpath d='M12 96 L52 62 L88 86 L132 52 L178 90 L222 60 L268 88 L304 66 L328 84 V130 H12Z' fill='%23b9c3ff'/%3E%3Cpath d='M12 106 Q70 80 128 102 T246 100 T328 98 V130 H12Z' fill='%23a6dcae'/%3E%3Cpath d='M12 118 Q90 102 170 116 T328 112 V130 H12Z' fill='%2378c98d'/%3E%3Cpath d='M150 130 C158 122 188 120 176 112 S152 106 166 100' stroke='%237fd3f5' stroke-width='6' fill='none'/%3E%3Cpath d='M44 116 l7 -16 l7 16Z M64 118 l6 -13 l6 13Z M258 114 l7 -16 l7 16Z M284 116 l6 -13 l6 13Z M216 112 l5 -11 l5 11Z' fill='%232f8a58'/%3E%3C/g%3E%3Crect x='12' y='12' width='316' height='118' rx='3' fill='none' stroke='%23121E6C' stroke-width='3'/%3E%3Crect x='167' y='12' width='6' height='118' fill='%23fffaf0' stroke='%23121E6C' stroke-width='1.5'/%3E%3Crect x='12' y='68' width='316' height='6' fill='%23fffaf0' stroke='%23121E6C' stroke-width='1.5'/%3E%3Crect x='4' y='134' width='332' height='14' rx='3' fill='%23e9d3a4' stroke='%23121E6C' stroke-width='3'/%3E%3C/svg%3E")}
+  .vwin{background:var(--valley) center/100% 100% no-repeat;image-rendering:auto}
+  .gwins{position:absolute;left:0;right:0;top:12px;bottom:auto;height:128px;background:var(--valley) repeat-x left top;background-size:auto 100%;z-index:0}
+  .zwall{height:340px;align-items:flex-end} .zwall .doors{padding-bottom:0}
+  .doors{gap:44px;align-items:flex-end} .corridor .pdoor{width:152px}
+  .elev{padding:0;border-radius:10px;cursor:pointer;transition:transform .12s}
+  .elev:hover{transform:translateY(-5px)} .elev:focus-visible{outline:4px solid #EE424E;outline-offset:3px}
+  .eind{display:flex;justify-content:space-between;align-items:center;gap:6px;background:#121E6C;color:#ffe08a;border:3px solid #0b1233;border-bottom:0;border-radius:10px 10px 0 0;padding:5px 9px}
+  .efl{font-weight:800;font-size:13px;letter-spacing:.6px;white-space:nowrap}
+  .elamp{font-style:normal;font-weight:800;font-size:12px;border-radius:99px;padding:1px 8px;background:#dfe3f4;color:#1d1840;border:2px solid #0b1233;white-space:nowrap}
+  .elev.question .elamp{background:#ffd04d} .elev.hand .elamp{background:#8ec5ff} .elev.working .elamp{background:#5fdc9b}
+  .edoor{position:relative;height:128px;display:flex;overflow:hidden;background:linear-gradient(#fff3cf,#ffd98a);border:3px solid #0b1233;border-top:2px solid #0b1233}
+  .ep{flex:1;background:linear-gradient(90deg,#eef0f7 0,#bcc1d6 45%,#e3e6f1 100%);border-right:2px solid #6c7194;transition:transform .25s}
+  .ep.r{border-right:0;border-left:2px solid #6c7194}
+  .edoor.open .ep.l{transform:translateX(-62%)} .edoor.open .ep.r{transform:translateX(62%)}
+  .elev.question .edoor{box-shadow:inset 0 0 0 3px #ffd04d} .elev.question{animation:pulse 1.4s ease-in-out infinite}
+  .esign{background:#fffaf0;color:#2b2a55;border:3px solid #0b1233;border-top:0;border-radius:0 0 10px 10px;padding:5px 8px 6px;text-align:center}
+  .esign b{display:block;font-size:13.5px;font-weight:800;line-height:1.2;color:#121E6C} .esign small{display:block;font-size:12px;font-weight:700;color:#4a4468}
+  .elev.question .esign small{color:#8a5a00} .elev.hand .esign small{color:#1f4fa0} .elev.working .esign small{color:#0f6b45}
+  .elev.sel .esign{box-shadow:0 0 0 3px #EE424E} .elev:hover .esign{box-shadow:0 0 0 3px #EE424E}
+  /* legibilidad: placas y barras con colores propios, independientes del tema */
+  .psign,.sign,.lampplan,.legend,.plate{background:#fffaf0;color:#2b2a55}
+  .sign{border-color:#121E6C;color:#121E6C;font-weight:800;font-size:13px}
+  .lampplan{border-color:#121E6C;font-size:13px;color:#2b2a55}
+  .plate b{color:#121E6C;font-size:13.5px} .plate small{color:#4a4468;font-size:12px}
+  .pbar{height:18px;background:#e6dffa;border:3px solid #121E6C}
+  .pbar i{background:#0f8a55;min-width:0} .pbar.warn i{background:#c98a00} .pbar.crit i{background:#C92A38}
+  .psum b,.ptitle b{color:#121E6C} [data-theme=dusk] .psum b,[data-theme=dusk] .ptitle b{color:#fff}
+  .hud .newp{background:#C92A38;border-color:#C92A38;color:#fff}
+  .fl em{color:#9c1c28} .fgrp{color:#9c1c28} [data-theme=dusk] .fgrp{color:#ffd6da}
+  .lampplan i{color:#1d1840}
+  /* pisos: más espacio */
+  .zfloor{min-height:300px;padding:20px 24px 26px} .corridor .zfloor .sign{margin-bottom:14px}
+  .corridor .runner{top:128px;bottom:auto;opacity:.55}
+  /* jerarquía */
+  .org{--z:1;display:flex;gap:46px;justify-content:center;align-items:flex-start;flex-wrap:nowrap;position:relative;z-index:2;padding:6px 10px}
+  .org .seat{width:222px;flex:none;zoom:var(--z)}
+  .branch{display:flex;flex-direction:column;align-items:center;gap:0}
+  .tier,.boss,.subs{display:flex;flex-direction:column;align-items:center}
+  .tcap{display:inline-block;background:#121E6C;color:#fff;font-size:12px;font-weight:800;border-radius:99px;padding:2px 12px;margin:0 0 6px;letter-spacing:.3px}
+  .boss .tcap{background:#C92A38} .boss.solo .tcap{background:#121E6C}
+  .trow{display:flex;gap:16px;justify-content:center;align-items:flex-start}
+  .subs{position:relative;padding-top:30px;margin-top:-4px}
+  .subs::before{content:"";position:absolute;top:0;left:50%;height:22px;border-left:4px solid #121E6C;transform:translateX(-2px)}
+  .subs .tcap{position:relative;z-index:1}
+  .subs .trow{border-top:4px solid #121E6C;padding-top:8px;position:relative}
+  .subs .trow .seat::before{content:"";position:absolute;left:50%;top:-12px;height:12px;border-left:4px solid #121E6C;transform:translateX(-2px);z-index:0}
+  .lobby #front{position:relative;z-index:2}
+  .zfloor .org .seat{margin:0}
+  /* sala por dentro: más amplia, 3 ventanas grandes */
+  .rwall{height:270px;padding:18px 26px 0;gap:30px;align-items:flex-start;justify-content:space-around}
+  .rwall .vwin{flex:1;max-width:420px;height:230px}
+  .rwall .clock{align-self:center;width:58px}
+  .elevmini{width:96px;align-self:flex-end;background:#121E6C;border:3px solid #0b1233;border-radius:8px 8px 0 0;overflow:hidden;position:relative;z-index:2}
+  .elevmini span{display:block;color:#ffe08a;font-weight:800;font-size:12px;text-align:center;padding:3px 0}
+  .elevmini i{display:block;height:84px;background:linear-gradient(90deg,#ffe3a0 0 22%,#c9cde0 22% 50%,#c9cde0 50% 78%,#ffe3a0 78%)}
+  .rfloor{min-height:420px;padding:34px 28px 30px}
+  .lobby .zwall .deco{gap:34px;padding:0 26px;align-items:flex-start;height:100%}
+  .lobby .zwall .deco .vwin{width:300px;height:210px;flex:none;margin-top:6px}
+  :root{--f7:#e2e6ff;--f8:#ffe9a8}
+  #office[data-floor="7"]{--ft:rgba(226,230,255,.8)} #office[data-floor="8"]{--ft:rgba(255,233,168,.8)}
+  #wall[data-fl="7"] .pdoor[data-floor="7"],#wall[data-fl="8"] .pdoor[data-floor="8"]{display:block}
+  .fgrp{flex:none;align-self:center;font-size:11px;font-weight:800;color:var(--bold-coral);margin:0 22px 0 -4px;white-space:nowrap}
+
+
+  /* contraste final (gana a reglas anteriores) */
+  .seat .plate{background:#fffaf0;color:#2b2a55} .seat .plate b{color:#121E6C} .seat .plate small{color:#4a4468}
+  .seat .alab{color:#4a4468} .seat .alab.working{color:#0f6b45} .seat .alab.question{color:#8a5a00} .seat .alab.done,.seat .alab.delivered{color:#1f4fa0}
+  .hnav .fgrp,.floors .fgrp{color:#9c1c28} [data-theme=dusk] .floors .fgrp{color:#ffd6da}
+</style>
+</head>
+<body>
+<div class="hud">
+  <h1><canvas id="logo" data-sprite="player" data-state="delivered" data-scale="1" style="width:32px;height:50px;margin:-6px 0"></canvas>Oficina BLD <small style="font-weight:600;font-size:12px;color:var(--muted)">vista pixel</small></h1>
+  <select id="init" aria-label="Proyecto"></select>
+  <button class="newp" id="newProj">＋ Nuevo proyecto</button>
+  <a href="/">Vista profesional</a>
+  <button id="openFolder">Abrir carpeta</button>
+  <span class="sp"></span>
+  <span class="stat" id="pWork">0 trabajando</span>
+  <span class="stat" id="pHand">✋ 0</span>
+  <span class="stat" id="pQ">0 preguntas</span>
+  <button id="liveBtn" aria-pressed="false">○ LIVE apagado · Encender</button>
+  <span class="o-sec" id="secChip" role="status">🛡 sin verificar</span>
+  <button id="theme" title="Cambiar entre tema pastel y atardecer">🌤 Pastel</button>
+</div>
+<div class="card pcard" id="pcard"><div class="none">Cargando proyecto…</div></div>
+<div class="wide">
+  <div class="office" id="office">
+    <div class="hallbar" id="hallbar">
+      <button class="o-btn" id="hLeft" aria-label="Desplazar a la izquierda">◀</button>
+      <div class="floors" id="hnav" role="navigation" aria-label="Menú de pisos: de la idea a la entrega"></div>
+      <button class="o-btn" id="hRight" aria-label="Desplazar a la derecha">▶</button>
+    </div>
+    <div class="scene" id="scene" tabindex="0" aria-label="Oficina: usa las flechas o arrastra para recorrer el pasillo">
+      <div class="strip" id="strip">
+        <section class="zone corridor" id="zCorr" data-zone="corridor">
+          <div class="zwall"><div class="gwins" aria-hidden="true"></div><div class="doors" id="wall" data-fl="all"></div></div>
+          <div class="zfloor"><div class="sign" id="corrSign">Todos los pisos · la luz de cada puerta dice quién te necesita · entra con un clic</div>
+            <div class="lampplan" aria-label="Plano de luces"><span class="q"><i>▲</i>pregunta: te espera</span><span class="h"><i>◆</i>terminó: atiéndelo</span><span class="w"><i>●</i>trabajando</span><span><i>○</i>sin actividad</span></div>
+            <div class="corrdeco" id="corrDeco"></div><div class="runner" id="runner"></div></div>
+        </section>
+        <section class="zone lobby" id="zLobby" data-zone="lobby">
+          <div class="zwall"><div class="deco" id="deco"></div></div>
+          <div class="zfloor"><div class="sign">Piso principal · el pipeline · toca a alguien para hablar con él en la terminal</div><div id="front"></div><div class="deco-floor" id="decoFloor"></div></div>
+        </section>
+      </div>
+      <div class="roomview" id="roomview" hidden></div>
+    </div>
+  </div>
+</div>
+<div class="cards4">
+  <div class="card"><h2>Proyectos</h2><div id="projects"></div></div>
+  <div class="card"><h2>Preguntas abiertas</h2><div id="quests"></div></div>
+  <div class="card"><h2>Estado de gates</h2><pre class="term" id="gate"></pre></div>
+  <div class="card"><h2>Carpeta del proyecto</h2><div id="folder"></div></div>
+</div>
+<div class="load" id="loading">Cargando assets…</div>
+
+<script src="/core.js"></script>
+<script>
+const O=Office, esc=O.esc, $=O.$;
+/* ---------- assets ---------- */
+const IMG={}, MAN={};
+const loadImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(src);i.src=src});
+const A=n=>`/assets/${n}.png`;
+const hash=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7);
+const frameFor=(st,t,name)=>st==="working"?"type"+(t%2):st==="question"?"hop"+(t%2):st==="hand"?"wave"+(t%2):st==="idle"?"sleep"+((t>>1)%2):((t+hash(name))%13===0?"blink":"stand"+((t>>2)%2));
+function drawChar(cv,name,st,t){
+  const M=MAN.char,ai=M.agents.indexOf(name); if(ai<0||!IMG.chars) return;
+  if(cv.dataset.seated&&st==='question') st='delivered';
+  const sc=+cv.dataset.scale||3;
+  if(cv.width!==M.w*sc){cv.width=M.w*sc;cv.height=M.h*sc;cv.style.width=cv.width+"px";cv.style.height=cv.height+"px"}
+  const g=cv.getContext("2d");g.imageSmoothingEnabled=false;g.clearRect(0,0,cv.width,cv.height);
+  g.drawImage(IMG.chars,M.frames.indexOf(frameFor(st,t,name))*M.w,ai*M.h,M.w,M.h,0,0,M.w*sc,M.h*sc);
+}
+function drawProp(cv,name){
+  const M=MAN.props,key=M.names.includes(name)?name:(M.agent_prop[name]||"doc"),i=M.names.indexOf(key),sc=+cv.dataset.scale||2;
+  cv.width=M.w*sc;cv.height=M.h*sc;cv.style.width=cv.width+"px";cv.style.height=cv.height+"px";const g=cv.getContext("2d");g.imageSmoothingEnabled=false;
+  g.drawImage(IMG.props,i*M.w,0,M.w,M.h,0,0,M.w*sc,M.h*sc);
+}
+let TICK=0;
+function paint(){
+  document.querySelectorAll("canvas[data-sprite]").forEach(cv=>drawChar(cv,cv.dataset.sprite,cv.dataset.state,TICK));
+  document.querySelectorAll("canvas[data-prop]").forEach(cv=>{if(!cv.dataset.done){drawProp(cv,cv.dataset.prop);cv.dataset.done=1}});
+  document.querySelectorAll("img[data-mon]").forEach(im=>{const s=im.dataset.mon;im.src=A("monitor_"+(s==="working"||s==="recent"?(TICK%4<2?"green":"cyan"):s==="question"?"yellow":s==="idle"?"off":"cyan")+(TICK%2));});
+}
+setInterval(()=>{TICK++;paint();},300);
+
+/* ---------- hitos del proyecto (datos reales: archivos entregados y su fecha) ---------- */
+const STAGE_ICON={"Brief":"telescope","PR":"news","PRD":"doc","Revisión PRD":"lens","Comms":"chat","HU":"notes","Revisión HU":"check","Mercado":"chart","Voz del cliente":"phones","Ideas":"bulb",
+  "Definición":"book","Diseños":"palette","Iteraciones":"brush","Revisión":"lens","Datos":"chart","Análisis":"radar","Reporte":"doc","Insumos":"book","Modelo ROI":"card","Lanzamiento":"mega","Entregable":"doc"};
+const TYPE_ICON={FEA:"notes",DIS:"palette",INV:"telescope",MET:"chart",CAM:"mega",OTR:"book"};
+const rel=ts=>{if(!ts)return"";const d=Math.round((Date.now()/1000-ts)/86400);return d<=0?"hoy":d===1?"ayer":`hace ${d} días`};
+function renderProject(D){
+  const S=D.state; if(!S){$("#pcard").innerHTML=`<div class="none">No hay proyectos todavía. Toca «Nuevo proyecto» para crear el primero.</div>`;return}
+  const T=O.typeOf(S.name), ms=O.milestones(S), done=ms.filter(m=>m.done).length, pct=Math.round(100*done/ms.length), P=O.proj(S.name)||{}, nx=ms.find(m=>m.next);
+  const last=[...ms].filter(m=>m.done).sort((a,b)=>b.at-a.at)[0];
+  $("#pcard").innerHTML=`<div class="ptop" style="--tc:${T.c}">
+      <div class="ticon"><canvas data-prop="${TYPE_ICON[T.code]||"book"}" data-scale="2"></canvas></div>
+      <div class="ptitle"><small><span class="idc">${esc(S.pid||T.code)}</span>${esc(T.n)}</small><b>${esc(O.title(S.name).replace(/-/g," "))}</b></div>
+      <div class="psum"><b>${done}/${ms.length} hitos · ${pct}%</b><div class="pbar ${P.frena?"crit":P.open_items?"warn":""}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Avance de hitos"><i style="width:${pct}%"></i></div>
+        <small>${last?`Último hito: ${esc(last.name)} · ${esc(rel(last.at))}`:"Aún sin hitos cumplidos"}${nx?` · Sigue: ${esc(nx.name)}`:""}</small></div></div>
+    <div class="route">${ms.map(m=>`<div class="node ${m.done?"done":m.next?"next":""}" title="${esc(m.done?m.file:"Pendiente")}"><div class="nic"><canvas data-prop="${STAGE_ICON[m.name]||"doc"}" data-scale="2"></canvas></div><b>${esc(m.name)}</b><small>${m.done?esc(m.date):m.next?"Siguiente":"Pendiente"}</small></div>`).join("")}</div>`;
+}
+
+/* ---------- vista ---------- */
+const sprState=x=>x.hand?"hand":x.state==="recent"?"working":x.state==="done"?"delivered":x.state;
+const bubble=x=>x.hand?'<div class="bubble h">✋</div>':({working:'<div class="bubble w">…</div>',recent:'<div class="bubble w">…</div>',question:'<div class="bubble q">!</div>',done:'<div class="bubble d">✔</div>',delivered:'<div class="bubble d">★</div>',idle:'<div class="bubble z">Zz</div>'}[x.state]||"");
+const ABAR={working:"Trabajando",recent:"Trabajando",question:"Esperando tu respuesta",done:"Terminó",delivered:"Entregó",idle:"Sin actividad"};
+const flags=x=>x.active.slice(0,2).map(p=>`<span class="flag" style="--pc:${O.typeOf(p.project).c}" title="${esc(p.project)}">${esc(O.short(p.project))}</span>`).join("")||(x.projects.length?`<span class="flag" style="--pc:#6b6490">${esc(O.short(x.projects[0].project))}</span>`:"");
+function seat(a){
+  const x=O.agent(a.name), st=sprState(x), bs=x.state==="recent"?"working":x.state;
+  return `<div class="seat seated ${x.hand?"hand":""} ${(O.tctx&&O.tctx.agent===a.name)||O.chat.agent===a.name?"sel":""}" data-agent="${esc(a.name)}" tabindex="0" role="button" aria-label="${esc(a.name)}: ${esc(ABAR[x.state]||x.state)}. Hablar con este agente en la terminal">
+    <div class="tip"><b>${esc(a.trait||a.role)}</b><i>“${esc(a.quote||x.note)}”</i></div>
+    <div class="flags">${flags(x)}</div>${bubble(x)}${x.open_items?`<span class="qn">❓ ${x.open_items}</span>`:""}
+    <div class="chair" aria-hidden="true"></div><canvas class="spr" data-sprite="${esc(a.name)}" data-state="${st}" data-scale="3" data-seated="1"></canvas>
+    <img class="desk" src="${A("desk")}" alt=""><img class="mon" data-mon="${x.state}" src="${A("monitor_cyan0")}" alt=""><canvas class="prop" data-prop="${esc(a.name)}" data-scale="2"></canvas>
+    <div class="plate"><b title="${esc(a.name)}">${esc(a.name.replace(/^bld-/,""))}</b><small>${esc(a.role)}</small>
+      <div class="abar ${bs}" role="progressbar" aria-label="Estado" aria-valuetext="${esc(ABAR[x.state]||x.state)}"><i></i></div><span class="alab ${bs}">${x.hand?"✋ Terminó: atiéndelo":esc(ABAR[x.state]||x.state)}</span></div></div>`;
+}
+const FLOORS=[
+  {n:0,b:"⌂",name:"Recepción",sub:"el pipeline y tu jefe",rooms:[],pin:1},
+  {n:8,b:"★",name:"OKR y seguimiento",sub:"KRs, roadmap, dependencias",rooms:["estrategia"],pin:1},
+  {n:1,b:"1",name:"Descubrir",sub:"mercado, clientes, ideas",rooms:["discovery"]},
+  {n:2,b:"2",name:"Definir",sub:"PR, PRD y comunicación",rooms:["pm-toolkit"]},
+  {n:3,b:"3",name:"Diseñar",sub:"prototipos UX/UI",rooms:["estudio"]},
+  {n:4,b:"4",name:"Revisar",sub:"revisión de PRD y HU",rooms:["revision"]},
+  {n:5,b:"5",name:"Construir",sub:"dev, QA y documentación",rooms:["taller"]},
+  {n:6,b:"6",name:"Apoyo",sub:"campañas, reportes, PR/FAQ",rooms:["utilidades"]},
+  {n:7,b:"7",name:"STORM",sub:"último paso: investigar y modelar",rooms:["storm-research","event-storming"]}];
+const ROOM_ORDER=FLOORS.flatMap(f=>f.rooms);
+const floorOf=id=>{const f=FLOORS.find(x=>x.rooms.includes(id));return f?f.n:6};
+const byFloor=rs=>[...rs].sort((a,b)=>{const i=ROOM_ORDER.indexOf(a.id),j=ROOM_ORDER.indexOf(b.id);return (i<0?99:i)-(j<0?99:j)});
+let FL="all";
+function setFloor(v){
+  FL=String(v);const w=$("#wall");w.dataset.fl=FL;$("#office").dataset.floor=FL==="all"?"":FL;
+  const f=FLOORS.find(x=>String(x.n)===FL);
+  $("#corrSign").textContent=f?`Piso ${f.n} · ${f.name} — ${f.sub}`:"Todos los pisos · la luz de cada puerta dice quién te necesita · entra con un clic";
+  O._navHTML=null; if(O.data) $("#hnav").innerHTML=O._navHTML=navHTML(O.data);
+  const sc=$("#scene"); if(FL==="0"){const z=$("#zLobby"); sc.scrollTo({left:z.offsetLeft,behavior:"smooth"})} else sc.scrollTo({left:0,behavior:"smooth"});
+}
+const shortAg=n=>String(n||"").replace(/^(bld-|pm-|storm-)/,"");
+function orgHTML(list){
+  const names=new Set(list.map(a=>a.name)), bossOf=a=>a.boss&&names.has(a.boss)?a.boss:null;
+  const tops=list.filter(a=>!bossOf(a)), kids=n=>list.filter(a=>bossOf(a)===n);
+  if(!list.some(bossOf)) return `<div class="org flat"><div class="tier"><span class="tcap">Equipo · todos responden a ti</span><div class="trow">${list.map(seat).join("")}</div></div></div>`;
+  return `<div class="org">${tops.map(t=>{const k=kids(t.name),cap=k.length?"★ Jefe":t.boss?`↑ reporta a ${esc(shortAg(t.boss))} (otro piso)`:"Independiente";return `<div class="branch"><div class="boss ${k.length?"":"solo"}"><span class="tcap">${cap}</span>${seat(t)}</div>${k.length?`<div class="subs"><span class="tcap">Sub-agentes de ${esc(shortAg(t.name))}</span><div class="trow">${k.map(seat).join("")}</div></div>`:""}</div>`}).join("")}</div>`;
+}
+function fitOrg(root){ // todos los agentes de un piso deben verse a la vez: reduce el tamaño si no caben
+  if(!root) return; root.querySelectorAll(".org").forEach(o=>{o.style.setProperty("--z",1);let z=1;
+    for(let i=0;i<3;i++){const avail=root.clientWidth-40,w=o.scrollWidth; if(w<=avail||z<=.5)break; z=Math.max(.5,+(z*avail/w).toFixed(3)); o.style.setProperty("--z",z);}});
+}
+const shortRoom=n=>n.replace(/^(Sala|Taller|Estudio de)\s+/i,"").replace("STORM · ","STORM ");
+const floorLabel=id=>{const f=FLOORS.find(x=>x.n===floorOf(id));return f?(f.n===8?"★ OKR":f.n===0?"PB":"PISO "+f.n):"PISO"};
+const floorName=id=>{const f=FLOORS.find(x=>x.n===floorOf(id));return f?f.name:""};
+function wallHTML(D){
+  return byFloor(D.rooms).map(r=>{const d=O.door(r),n=d.state==="question"?d.questions:d.state==="hand"?d.hands:d.working;
+    return `<div class="pdoor elev ${d.state} ${O.side.room===r.id?"sel":""}" data-room="${r.id}" data-floor="${floorOf(r.id)}" tabindex="0" role="button" aria-label="${esc(d.aria)}" ${O.side.room===r.id?'aria-current="true"':""} title="${esc(r.name)} — ${esc(d.tip)}">
+      <div class="eind"><span class="efl">${floorLabel(r.id)}</span><i class="elamp" aria-hidden="true">${d.icon}${d.state==="idle"?"":" "+n}</i></div>
+      <div class="edoor ${d.open||d.state!=="idle"?"open":""}" aria-hidden="true"><span class="ep l"></span><span class="ep r"></span></div>
+      <div class="esign"><b>${esc(shortRoom(r.name))}</b><small>${esc(d.state==="idle"?"sin actividad":d.label)}</small></div></div>`}).join("");
+}
+let ROOM=null,SAVED=0;
+const lampOf=d=>`${d.icon} ${d.state==="idle"?"sin actividad":d.label}`;
+function navHTML(D){
+  const one=(id,name,sub,n,ds)=>{const q=ds.reduce((a,d)=>a+d.questions,0),h=ds.reduce((a,d)=>a+d.hands,0),w=ds.reduce((a,d)=>a+d.working,0);
+    const st=q?"question":h?"hand":w?"working":"";
+    return `<button class="fl ${st} ${FL===String(id)?"on":""}" data-floor="${id}" style="--fc:${id==="all"?"#fff":`var(--f${id})`}" aria-pressed="${FL===String(id)}" title="${esc(sub)}"><b><i>${n}</i>${esc(name)}</b><small>${esc(sub)}</small><em>${q?`▲ ${q} pregunta${q>1?"s":""}`:h?`◆ ${h} terminó`:w?`● ${w} trabajando`:""}</em></button>`};
+  const ds=f=>f.rooms.length?D.rooms.filter(r=>floorOf(r.id)===f.n).map(r=>O.door(r)):[];
+  return one("all","Todos","ver todo el edificio","★",D.rooms.map(r=>O.door(r)))
+    +FLOORS.filter(f=>f.pin).map(f=>one(f.n,f.name,f.sub,f.b,ds(f))).join("")
+    +`<span class="fgrp">inicio → fin</span>`+FLOORS.filter(f=>!f.pin).map(f=>one(f.n,f.name,f.sub,f.b,ds(f))).join("");
+}
+function roomHTML(D){
+  const r=D.rooms.find(x=>x.id===ROOM); if(!r) return "";
+  const d=O.door(r);
+  return `<div class="rhead"><button class="o-btn" id="rBack">← Salir al pasillo</button><b>${esc(r.name)}</b><span class="o-muted">Piso ${floorOf(r.id)} · ${esc((FLOORS.find(f=>f.n===floorOf(r.id))||{}).name||"")}</span><span class="rlamp ${d.state}">${esc(lampOf(d))}</span>
+      <span class="o-muted">${d.working} trabajando · ${d.hands} terminaron · ${d.questions} con preguntas · ${d.total} sentados</span></div>
+    <div class="rwall"><div class="vwin"></div><div class="elevmini" aria-label="Ascensor por el que entraste"><span>${floorLabel(r.id)}</span><i></i></div><div class="vwin"></div><img class="clock" src="${A("clock")}" alt=""><div class="vwin"></div></div>
+    <div class="rfloor"><div class="rrug"></div>${orgHTML(r.agents)}
+      <div class="rdeco"><img class="plant" src="${A("plant")}" alt=""><img class="shelf" src="${A("bookshelf")}" alt=""><img class="plant" src="${A("plant")}" alt=""></div></div>`;
+}
+function showRoom(){
+  const on=!!ROOM; $("#strip").hidden=on; $("#hallbar").hidden=on; $("#roomview").hidden=!on; $("#scene").style.cursor=on?"default":"";
+  if(on){const rv=$("#roomview"); if(O.data){rv.innerHTML=O._rv=roomHTML(O.data);fitOrg(rv)}}
+}
+$("#deco").innerHTML=`<div class="vwin"></div><img class="wb" src="${A("whiteboard")}" alt=""><img class="clock" src="${A("clock")}" alt=""><div class="vwin"></div><div class="vwin"></div>`;
+$("#corrDeco").innerHTML=["plant","bookshelf","plant","cooler","plant","bookshelf","plant"].map(n=>`<img class="${n==="cooler"?"cool":n==="bookshelf"?"shelf":"plant"}" src="${A(n)}" alt="">`).join("");
+$("#decoFloor").innerHTML=`<img class="plant" src="${A("plant")}" alt=""><img class="cool" src="${A("cooler")}" alt=""><img class="shelf" src="${A("bookshelf")}" alt=""><img class="plant" src="${A("plant")}" alt="">`;
+const themeBtn=$("#theme"),setTheme=t=>{document.documentElement.dataset.theme=t;localStorage.setItem("office.theme",t);themeBtn.textContent=t==="pastel"?"🌤 Pastel":"🌙 Atardecer"};
+setTheme(document.documentElement.dataset.theme);
+themeBtn.onclick=()=>setTheme(document.documentElement.dataset.theme==="pastel"?"dusk":"pastel");
+
+Promise.all([loadImg(A("characters")).then(i=>IMG.chars=i),loadImg(A("props")).then(i=>IMG.props=i),
+  fetch("/assets/manifest.json").then(r=>r.json()).then(m=>Object.assign(MAN,m))]).then(()=>{
+  $("#loading").remove();
+  Office.start({
+    inlineRooms:true,
+    enterRoom(r){SAVED=$("#scene").scrollLeft;ROOM=r.id;O._rv=null;$("#office").dataset.floor=floorOf(r.id);showRoom();},
+    leaveRoom(){ROOM=null;$("#office").dataset.floor=FL==="all"?"":FL;showRoom();const sc=$("#scene");sc.style.scrollBehavior="auto";sc.scrollLeft=SAVED;requestAnimationFrame(()=>{sc.style.scrollBehavior=""});},
+    palette:["#3b5dc9","#c23c85","#257179","#8a4fb3","#d9822b","#566c86"],
+    avatar:(name,state,sc)=>`<canvas data-sprite="${esc(name)}" data-state="${state==="done"?"delivered":state==="recent"?"working":state}" data-scale="${sc||3}"></canvas>`,
+    afterChat:paint,
+    render(D){
+      const sel=$("#init");
+      if(sel.options.length!==D.initiatives.length+1||sel.dataset.n!==D.initiatives.map(i=>i.name).join()){sel.dataset.n=D.initiatives.map(i=>i.name).join();sel.innerHTML=`<option value="">Todos los proyectos</option>`+D.initiatives.map(i=>`<option value="${esc(i.name)}">${esc(i.pid||i.type)} · ${esc(i.title)}</option>`).join("")}
+      sel.value=O.cur;
+      {const h=wallHTML(D); if(h!==O._wallHTML){const f=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.room; $("#wall").innerHTML=O._wallHTML=h; if(f){const el=document.querySelector(`#wall [data-room="${f}"]`); el&&el.focus();}}}
+      {const f=orgHTML(D.front); if(f!==O._frontHTML){$("#front").innerHTML=O._frontHTML=f; $("#zLobby").style.width=$("#scene").clientWidth+"px"; fitOrg($("#zLobby"));}}
+      {const n=navHTML(D); if(n!==O._navHTML) $("#hnav").innerHTML=O._navHTML=n;}
+      document.querySelectorAll("#zCorr .zwall").forEach(()=>{}); // (las puertas se dibujan arriba)
+      if(ROOM){const rv=roomHTML(D); if(rv!==O._rv){const f=document.activeElement&&document.activeElement.id; $("#roomview").innerHTML=O._rv=rv; fitOrg($("#roomview")); if(f==="rBack") $("#rBack").focus();}}
+      renderProject(D);
+      if(D.state){
+        const S=D.state;
+        $("#projects").innerHTML=D.initiatives.map(p=>{const T=O.typeOf(p.name),pct=Math.round(100*p.stages_done/p.stages_total);
+          return `<button class="pj ${O.cur===p.name?"on":""}" data-proj="${esc(p.name)}" style="--tc:${T.c}"><div class="t"><span class="idc" style="margin:0">${esc(p.pid||T.code)}</span><span>${esc(p.title.replace(/-/g," "))}</span></div>
+          <div class="pbar ${p.frena?"crit":p.open_items?"warn":""}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${pct}%"></i></div><small><span>${esc(T.n)} · <b>${p.stages_done}/${p.stages_total}</b> hitos</span><span>${p.open_items} preguntas${p.frena?` · <b>${p.frena} frenan</b>`:""}</span></small></button>`}).join("")+(O.cur?`<button class="btn" data-proj="">Ver todos</button>`:"");
+        const oi=S.open_items;
+        $("#quests").innerHTML=oi.length?oi.map(q=>{const f=q.blocks.replace(/\s/g,"")==="frena";return `<div class="quest ${f?"frena":""}" data-file="${esc(q.file)}">${esc(q.id)} · ${esc(q.type)}${f?" · FRENA":""}<small>${esc(q.item)}</small><small>${esc(q.file)}</small></div>`}).join("")
+          :`<div class="none">Sin preguntas abiertas. Las dudas de los agentes aparecen aquí.</div>`;
+        $("#gate").textContent=S.gate;
+        $("#folder").innerHTML=`<div class="none" style="margin-bottom:6px">${Object.entries(S.subdirs).map(([k,v])=>`${esc(k)}/${v}`).join(" · ")}</div>${S.root_files.map(f=>`<button class="btn" data-open="${esc(f)}">${esc(f)}</button>`).join("")}`;
+      }
+      const st=O.stats();
+      $("#pWork").textContent=`${st.working} trabajando`;
+      $("#pHand").textContent=`✋ ${st.hands} terminaron`;$("#pHand").className="stat "+(st.hands?"hand":"");
+      $("#pQ").textContent=`${st.questions} preguntas`+(st.frena?` · ${st.frena} frenan`:"");$("#pQ").className="stat "+(st.frena?"red":st.questions?"amb":"");
+      document.querySelectorAll("canvas[data-prop]").forEach(c=>delete c.dataset.done);
+      paint();
+    }
+  });
+}).catch(e=>{$("#loading").textContent="No se pudieron cargar los assets: "+e+" · ejecuta make_assets.py"});
+
+document.addEventListener("click",e=>{
+  if(e.target.closest("#rBack")){O.closeRoom();return}
+  const nv=e.target.closest("#hnav [data-floor]");
+  if(nv){setFloor(nv.dataset.floor);return}
+  if(e.target.closest("#hLeft")){$("#scene").scrollBy({left:-640,behavior:"smooth"});return}
+  if(e.target.closest("#hRight")){$("#scene").scrollBy({left:640,behavior:"smooth"});return}
+  const t=e.target.closest("[data-agent],[data-room],[data-open],[data-proj],.quest[data-file],#openFolder,#newProj,#doorNew");
+  if(!t) return;
+  if(t.dataset.agent) O.talkTerm(t.dataset.agent);
+  else if(t.dataset.room) O.openRoom(t.dataset.room);
+  else if(t.dataset.proj!==undefined) O.setProject(t.dataset.proj);
+  else if(t.dataset.open) O.openFile(t.dataset.open);
+  else if(t.classList.contains("quest")) O.openFile(t.dataset.file);
+  else if(t.id==="newProj"||t.id==="doorNew") O.newProject();
+  else if(t.id==="openFolder") O.post("/api/open-folder?i="+encodeURIComponent(O.cur||O.data.focus));
+});
+(()=>{const sc=$("#scene");let down=false,x0=0,s0=0,moved=0;
+  sc.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0||ROOM||e.target.closest("button,[role=button],input"))return;down=true;x0=e.clientX;s0=sc.scrollLeft;moved=0});
+  window.addEventListener("pointermove",e=>{if(!down)return;moved=Math.abs(e.clientX-x0);if(moved>4)sc.classList.add("drag");sc.scrollLeft=s0-(e.clientX-x0)});
+  window.addEventListener("pointerup",()=>{down=false;sc.classList.remove("drag")});})();
+$("#init").addEventListener("change",e=>O.setProject(e.target.value));
+</script>
+</body>
+</html>

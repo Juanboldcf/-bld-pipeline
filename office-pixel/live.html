@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Oficina BLD · Pixel Agents en vivo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- SOLO LOCAL. Incrusta Pixel Agents (extensión open-source, MIT: github.com/pixel-agents-hq/pixel-agents) si ya corre en 127.0.0.1:3100.
+     Esta página no lo instala ni lo ejecuta: lo levanta el PM con el comando de abajo. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
+<style>
+  :root{--bg:#f4efff;--panel:#fff;--ink:#3d3560;--muted:#5f5888;--line:#cdbff2;--accent:#5b3fd0;--mint:#c9f2de;--mint-ink:#16704a;--butter:#fff1b8;--butter-ink:#7a4f00}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Montserrat,sans-serif;font-size:14px;display:flex;flex-direction:column;height:100vh}
+  header{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 20px;background:var(--panel);border-bottom:4px solid var(--line)}
+  header h1{margin:0;font-size:17px;font-weight:800;color:var(--accent)} header .sp{flex:1}
+  a,button{font:inherit;font-size:13px;font-weight:700;background:#f8f5ff;color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:7px 13px;cursor:pointer;text-decoration:none}
+  a:hover,button:hover{border-color:var(--accent);color:var(--accent)}
+  .st{border-radius:99px;padding:5px 13px;font-size:12.5px;font-weight:700;border:2px solid var(--butter-ink);background:var(--butter);color:var(--butter-ink)} .st.ok{background:var(--mint);border-color:var(--mint-ink);color:var(--mint-ink)}
+  main{flex:1;min-height:0;display:flex} iframe{flex:1;border:0;background:#fff} .help{margin:auto;max-width:640px;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:22px}
+  .help h2{margin:0 0 8px;color:var(--accent)} code,pre{font-family:ui-monospace,Menlo,monospace} pre{background:#4a4270;color:#fff;border-radius:10px;padding:10px 12px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+  .help li{margin-bottom:6px} [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <h1>Pixel Agents en vivo</h1><span class="st" id="st">Buscando…</span><span class="sp"></span>
+  <a href="/pixel">Vista pixel</a><a href="/">Vista profesional</a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=pablodelucca.pixel-agents" target="_blank" rel="noopener">Extensión en VS Code ↗</a>
+  <button id="re">Reintentar</button>
+</header>
+<main>
+  <iframe id="fr" title="Pixel Agents" hidden></iframe>
+  <div class="help" id="help" hidden>
+    <h2>Pixel Agents no está corriendo</h2>
+    <p><b>Pixel Agents</b> (open-source, MIT, sin costo) convierte tus sesiones de Claude Code en personajes pixel art que caminan, se sientan y escriben en una oficina. La Oficina BLD lo muestra aquí cuando está activo. Es complementario: esta app sabe de <i>tus proyectos y agentes BLD</i>; Pixel Agents ve <i>cada sesión de Claude Code</i> (incluidos los sub-agentes).</p>
+    <p><b>Opción A · navegador (recomendada).</b> En una terminal, en solo lectura y solo en tu máquina:</p>
+    <pre id="cmd">ASDF_NODEJS_VERSION=$(asdf latest nodejs 22) npx -y pixel-agents --host 127.0.0.1 --port 3100 --no-terminal</pre>
+    <p class="muted">Necesita Node 22 o superior (una dependencia no corre con Node 20). Con asdf: <code>asdf install nodejs latest:22</code> una sola vez; el comando de arriba lo usa solo para esta ejecución.</p>
+    <p><button id="cp">Copiar comando</button></p>
+    <p><b>Opción B · VS Code.</b> Instala la extensión desde el Marketplace y abre el panel «Pixel Agents» junto a la terminal.</p>
+    <ul><li>No actives «hooks» desde su configuración: editarían tu <code>~/.claude/settings.json</code>. Sin hooks igual detecta las sesiones leyendo las transcripciones.</li>
+    <li>La Oficina BLD no guarda nada de esto en Bold Brain.</li></ul>
+  </div>
+</main>
+<script>
+const URL_PA="http://127.0.0.1:3100/", fr=document.getElementById("fr"), help=document.getElementById("help"), st=document.getElementById("st");
+async function check(){
+  st.className="st"; st.textContent="Buscando…";
+  try{ await fetch(URL_PA,{mode:"no-cors",cache:"no-store"}); if(!fr.src) fr.src=URL_PA; fr.hidden=false; help.hidden=true; st.className="st ok"; st.textContent="Conectado · 127.0.0.1:3100"; }
+  catch(e){ fr.hidden=true; fr.removeAttribute("src"); help.hidden=false; st.textContent="No está corriendo"; }
+}
+document.getElementById("re").onclick=check;
+document.getElementById("cp").onclick=async()=>{await navigator.clipboard.writeText(document.getElementById("cmd").textContent);document.getElementById("cp").textContent="Copiado ✓"};
+check(); setInterval(()=>{ if(fr.hidden) check(); },6000);
+</script>
+</body>
+</html>
