@@ -8,3 +8,6 @@ config.json
 
 # Local memory that shouldn't be shared
 agent-memory-local/
+
+__pycache__/
+office/.security/

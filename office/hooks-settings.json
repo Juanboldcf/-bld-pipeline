@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Agent|Task",
+        "hooks": [ { "type": "command", "command": "python3 /Users/juan.alvarez/.claude/office/hook.py", "async": true, "timeout": 10 } ] }
+    ],
+    "SubagentStart": [
+      { "hooks": [ { "type": "command", "command": "python3 /Users/juan.alvarez/.claude/office/hook.py", "async": true, "timeout": 10 } ] }
+    ],
+    "SubagentStop": [
+      { "hooks": [ { "type": "command", "command": "python3 /Users/juan.alvarez/.claude/office/hook.py", "async": true, "timeout": 10 } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Write|Edit|MultiEdit",
+        "hooks": [ { "type": "command", "command": "python3 /Users/juan.alvarez/.claude/office/hook.py", "async": true, "timeout": 10 } ] }
+    ]
+  }
+}
